@@ -1,0 +1,178 @@
+{% extends 'dashboard/base.html' %}
+{% block content %}
+
+            <!--app-content open-->
+            <div class="main-content app-content mt-0">
+                <div class="side-app">
+
+                    <!-- CONTAINER -->
+                    <div class="main-container container-fluid">
+
+                        <!-- PAGE-HEADER -->
+                        <div class="page-header">
+                            <h1 class="page-title">Productlar</h1>
+                            <a href="{% url 'write' %}">
+                            <button class="btn btn-primary" type="submit">Excel generate</button></a>
+                            <form  method="get" >
+                                <input type="text" name="name" placeholder="nomi">
+                                <input type="number" name="quantity_min" placeholder="soni ...tadan">
+                                <input type="number" name="quantity_max" placeholder="soni ...tagacha">
+                                <input type="number" name="price_min" placeholder="narxi ...dan ">
+                                <input type="number" name="price_max" placeholder="narxi ...gacha">
+                                <button type="submit" class="btn btn-primary">filter</button>
+                            </form>
+                            
+                        </div>
+                        <!-- PAGE-HEADER END -->
+                        
+                        <!-- Row -->
+                        <div class="row">
+                            <div class="col-2"></div>
+                            <div class="col-xl-9">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h3 class="card-title">Productlar ro`yxati</h3>
+
+                                        <!-- <button class="btn btn-primary bg-primary-gradient mt-3" data-bs-toggle="modal" data-bs-target="#smallmodal" style="border-top-left-radius: 0; border-top-right-radius: 0;">Filterlash</button> -->
+
+
+                                    </div>                                    
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table text-nowrap text-md-nowrap mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>№</th>
+                                                        <th>Name</th>
+                                                        <th>Quantity</th>
+                                                        <th>Price</th>
+                                                        <th>Pul birligi</th>
+                                                        <th>O`zgartirish</th>
+                                                        <th>O`chirish</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for product in products %}
+                                                    <tr>
+                                                        <td>{{ forloop.counter }}</td>
+                                                        <td>{{ product.name }}</td>
+                                                        <td>{{ product.quantity }}</td>
+                                                        <td>{{ product.price }}</td>
+                                                        {% if product.currency == 1 %}
+                                                            <td>$</td>
+                                                        {% else %}
+                                                            <td>So'm</td>
+                                                        {% endif %}
+                                                        <td>
+                                                            <a class="btn btn-icon btn-success" data-bs-toggle="modal" data-bs-target="#smallmodal{{product.id}}" style="color: white;">
+                                                                <i class="fa fa-arrow-right" >
+
+                                                                </i>
+                                                            </a>
+                                                        </td>
+                                                        <td>
+                                                            <a class="btn btn-icon btn-danger" data-bs-toggle="modal" data-bs-target="#delete{{product.id}}" style="color: white;">
+                                                                <i class="fe fe-trash">
+
+                                                                </i>
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-12 text-right">
+                                        {% if products.paginator.num_pages > 1 %}
+                                            <nav aria-label="Page navigation example" class="text-end">
+                                                <ul class="pagination">
+                                                    {% if products.has_previous %}
+                                                    <li class="page-item page-prev"><a class="page-link" href="?page={{ products.previous_page_number }}"><<</a></li>
+                                                    {% endif %}
+                                                    {% for num in products.paginator.page_range %}
+                                                        {% if num == products.number %}
+                                                            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                                                        {% elif num > products.number|add:'-2' and num < products.number|add:'2' %}
+                                                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {% if products.has_next %}
+                                                        <li class="page-item page-next"><a class="page-link" href="?page={{ products.next_page_number }}">>></a></li>
+                                                    {% endif %}
+                                                </ul>
+                                            </nav>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Row -->
+
+                    </div>
+                    <!-- CONTAINER CLOSED -->
+
+                </div>
+            </div>
+            <!--app-content close-->
+
+        </div>
+
+        <div class="modal  fade" id="smallmodal" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <form method="get">
+                        {% csrf_token %}
+                        <div class="modal-header">
+                            <h5 class="modal-title">Filterlash</h5>
+                            <button class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="false">×</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="name" style="margin-right: 30px;">Nomi</label>
+                            <input type="text" name="name" id="name" >
+                            <label for="quantity" style="margin-right: 15px;">Miqdori</label>
+                            <input type="number" name="quantity" id="quantity" >
+                            <label for="price" style="margin-right: 29px;">Narxi</label>
+                            <input type="number" name="price" id="price" >
+                        </div>
+                        <div class="modal-footer">
+                            
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% for product in products %}
+        <div class="modal fade" id="smallmodal{{product.id}}">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                   
+                    <h2>O'zgartirishni xohlaysizmi?</h2>
+                    
+                    <div class="modal-footer justify-content-center">
+                       <a href="{% url 'product_update' product.id %}"> <button class="btn btn-primary" type="submit">Ha</button></a> <button class="btn btn-danger" data-bs-dismiss="modal">Yo'q</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {%endfor%}
+        {% for product in products %}
+        <div class="modal fade" id="delete{{product.id}}">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                   
+                    <h2>O'chirishni xohlaysizmi?</h2>                    
+                    <div class="modal-footer justify-content-center">
+                       <a  href="{% url 'product_delete' product.id %}" > <button class="btn btn-primary" type="submit">Ha</button></a> <button class="btn btn-danger" data-bs-dismiss="modal">Yo'q</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {%endfor%}
+
+
+{% endblock%}

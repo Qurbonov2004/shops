@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+
+<!-- Product Start -->
+<div class="container">
+    <div class="row">
+        {% for i in product %} 
+                      
+            <div class="col-md-3">
+                <div style="display: flex; justify-content: space-between;">
+                    <h2>{{product.name}}</h2>
+                    {% if is_saved %}
+                    <a href="{% url 'main:delete_wish' %}?id={{is_saved}}">
+                        <i class="fa-solid fa-heart" style="font-size: 20px; color: crimson;" ></i>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'main:create_wishlist' %}?product_id={{i.id}}">
+                        <i class="fa-regular fa-heart" style="font-size: 25px;"></i>
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="product" >
+                    <a href="{% url 'main:detail' i.id %}" class="mask">
+                        <img class="img-responsive zoom-img" src="{{ i.baner_image.url }}" alt="{{ i.name }}" />
+                    </a>
+                    
+                    <div class="product-info" s>
+                        <h3>{{ i.name }}</h3>
+                        
+                        <p>{{ i.description }}</p>
+                        {% if i.currency == 1 %}
+                            <h4>
+                                <a class="item_add" href="{% url 'main:add_to_cart' i.id %}"><i></i></a>
+                                <span class="item_price">{{ i.price }} $</span>
+                            </h4>
+                        {% else %}
+                            <h4>
+                                <a class="item_add" href="{% url 'main:carts' %}"><i></i></a>
+                                <span class="item_price">{{ i.price }} So'm</span>
+                            </h4>
+                        {% endif %}
+                        <!-- Add more product details or buttons here -->
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+    <!-- Product End -->
+
+
+	{% endblock %}

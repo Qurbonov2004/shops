@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Combined List</title>
+</head>
+<body>
+    <h2>Combined List</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Quantity</th>
+                <th>Product Name</th>
+                <th>Created At / Total Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in combined_list %}
+                <tr>
+                    <td>{{ item.type }}</td>
+                    {% if item.type == 'enter' %}
+                        <td>{{ item.data.quantity }}</td>
+                        <td>{{ item.data.product_name }}</td>
+                        <td>{{ item.data.created_at }}</td>
+                    {% else %}
+                        <td></td>
+                        <td>{{ item.data.name }}</td>
+                        <td>{{ item.data.total_quantity }}</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

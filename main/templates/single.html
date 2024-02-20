@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+	<!--start-single-->
+	<div class="single contact">
+		<div class="container">
+			<div class="single-main">
+				<div class="col-md-9 single-main-left">
+				<div class="sngl-top">
+					<div class="col-md-5 single-top-left">	
+						<div class="flexslider">
+							<ul class="slides">
+								{% for image in images %}
+									<li data-thumb="{{ image.image.url }}">
+										<div class="thumb-image"> <img src="{{ image.image.url }}" data-imagezoom="true" class="img-responsive" alt=""/> </div>
+									</li>
+								{% endfor %}
+							</ul>
+							
+							
+						</div>
+						<!-- FlexSlider -->
+						<script src="{% static 'js/imagezoom.js' %}"></script>
+						<script defer src="{% static 'js/jquery.flexslider.js' %}"></script>
+						<link rel="stylesheet" href="{% static 'css/flexslider.css' %}" type="text/css" media="screen" />
+
+						<script>
+						// Can also be used with $(document).ready()
+						$(window).load(function() {
+						  $('.flexslider').flexslider({
+							animation: "slide",
+							controlNav: "thumbnails"
+						  });
+						});
+						</script>
+					</div>
+				</div>
+				<div class="col-md-7 single-top-right">
+					<div style="display: flex; justify-content: space-between;">
+                        <h2>{{product.name}}</h2>
+                        {% if is_saved %}
+                        <a href="{% url 'main:delete_wish' %}?id={{is_saved}}">
+							<i class="fa-solid fa-heart" style="font-size: 20px; color: crimson;" ></i>
+                        </a>
+                        {% else %}
+                        <a href="{% url 'main:create_wishlist' %}?product_id={{product.id}}">
+                            <i class="fa-regular fa-heart" style="font-size: 25px;"></i>
+                        </a>
+                        {% endif %}
+                    </div>
+					<div class="single-para simpleCart_shelfItem">
+					<h2>{{product.name}}</h2>
+					<div class="rating-stars">
+						<input type="radio" name="rating" id="rs0" checked><label for="rs0"></label>
+						<input type="radio" name="rating" id="rs1"><label for="rs1"></label>
+						<input type="radio" name="rating" id="rs2"><label for="rs2"></label>
+						<input type="radio" name="rating" id="rs3"><label for="rs3"></label>
+						<input type="radio" name="rating" id="rs4"><label for="rs4"></label>
+						<input type="radio" name="rating" id="rs5"><label for="rs5"></label>
+						<span class="rating-counter"></span>
+					</div>	
+						
+						<h5 class="item_price">{{product.price}}</h5>
+						<p>{{product.description}}</p>							
+							<a href="{% url 'main:add_to_cart' product.id%}" class="add-cart item_add">ADD TO CART</a>
+							<button type="button"  data-toggle="modal" data-target="#myModal" class="btn btn-primary">
+								Baholash
+							  </button>
+						</div>
+					</div>	
+					
+					<div class="clearfix"> </div>
+				</div>
+				<div class="tabs">
+					
+				</div>
+				<div class="clearfix"></div>
+			</div>
+		</div>
+	</div>
+				
+
+	<!--product-starts-->
+				<div class="container">
+    <div class="row">
+        {% for i in recomendation %}
+		{% if product.id != i.id%}
+            <div class="col-md-3">
+                <div class="product">
+                    <a href="{% url 'main:detail' i.id %}" class="mask">
+                        <img class="img-responsive zoom-img" src="{{ i.baner_image.url }}" alt="{{ i.name }}" />
+                    </a>
+                    <div class="product-info" s>
+                        <h3>{{ i.name }}</h3>
+                        <p>{{ i.description }}</p>
+                        {% if i.currency == 1 %}
+                            <h4>
+                                <a class="item_add" href="{% url 'main:add_to_cart' i.id %}"><i></i></a>
+                                <span class="item_price">{{ i.price }} $</span>
+                            </h4>
+                        {% else %}
+                            <h4>
+                                <a class="item_add" href="{% url 'main:carts' %}"><i></i></a>
+                                <span class="item_price">{{ i.price }} So'm</span>
+                            </h4>
+                        {% endif %}
+                        <!-- Add more product details or buttons here -->
+                    </div>
+                </div>
+            </div>
+			{% endif%}
+        {% endfor %}
+    </div>
+</div>
+	<!--product-end-->
+
+	<!-- Boshlanishi Modal -->
+<div class="modal fade " style="margin-bottom: auto;"     id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" >
+	<div class="modal-dialog" role="document">
+	<form method="post">
+		{% csrf_token%}
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="exampleModalLabel">Baholash oynasi</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body">
+			<label >5 ballik sistemada baholang</label>
+		  <input type="number" name="baho">
+		</div>
+		<div class="modal-footer">
+		  <button type="submit" class="btn btn-primary" >Baholash</button>
+		</div>
+	  </div>
+	  </form>
+	</div>
+  </div>
+  <!-- Oxirishi Modal -->
+
+
+	
+
+				
+						
+	
+				
+
+		{% endblock %}

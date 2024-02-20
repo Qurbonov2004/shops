@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+	<!--register-starts-->
+	<form method="post">
+		{% csrf_token %}
+		<div class="register">
+			<div class="container">
+				<div class="register-top heading">
+					<h2>REGISTER</h2>
+				</div>
+				<div class="register-main">
+					<div class="col-md-6 account-left">
+						<input placeholder="Email address" type="text"  name="username">
+					</div>
+					<div class="col-md-6 account-left">
+						<input placeholder="Password" type="password"  name="password">
+						<input placeholder="Retype password" type="password" name="password_confirmation">
+					</div>
+					<div class="clearfix"></div>
+				</div>
+				<div class="address submit">
+					<input type="submit" value="Submit">
+				</div>
+			</div>
+		</div>
+	</form>
+	
+	<!--register-end-->
+
+
+
+	{% endblock %}

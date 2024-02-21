@@ -2,16 +2,26 @@ from django.db import models
 from django.contrib.auth.models import User
 from functools import reduce
 from django.db.models import Sum
+from django.utils.text import slugify
+from unidecode import unidecode
+from django.db import models
 
 class Category(models.Model):
     name = models.CharField(max_length=255, unique=True)
+    slug = models.SlugField(blank=True)
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(unidecode(self.name))
+        super(Category, self).save(*args, **kwargs)
+
 
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
+    slug=models.SlugField(blank=True)
     description = models.TextField()
     quantity = models.IntegerField()
     price = models.DecimalField(decimal_places=2, max_digits=10)
@@ -52,30 +62,50 @@ class Product(models.Model):
     
     def __str__(self):
         return self.name
+    
+    def save(self,*args,**kwargs):
+        self.slug=slugify(unidecode(self.name))
+        super(Product,self).save(*args,**kwargs)
+
 
 
 class ProductImage(models.Model):
     image = models.ImageField(upload_to='products/')
+    slug=models.SlugField(blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
 
     def __str__(self):
-
         return self.product.name
+    
+    def save(self,*args,**kwargs):
+        self.slug=slugify(unidecode(self.product.name))
+        super(ProductImage,self).save(*args,**kwargs)
 
 
 class WishList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    slug=models.SlugField(blank=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    def sava(self,*args,**kwargs):
+        self.slug = slugify(unidecode(f"{self.user.username}-{self.product.name}"))
+        super(WishList,self).save(*args,**kwargs)
 
 
 class ProductReview(models.Model):
+    slug=models.SlugField(blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     mark = models.SmallIntegerField()
 
+    def sava(self,*args,**kwargs):
+        self.slug = slugify(unidecode(f"{self.user.username}-{self.product.name}"))
+        super(ProductReview,self).save(*args,**kwargs)
+
 
 class Card(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    slug=models.SlugField(blank=True)
     is_active = models.BooleanField(default=True)
 
     @property
@@ -88,9 +118,14 @@ class Card(models.Model):
         for i in CardProduct.objects.filter(card_id=self.id):
             result +=(i.product.price)*i.quantity
         return result
+    
+    def sava(self,*args,**kwargs):
+        self.slug=slugify(unidecode(self.user))
+        super(Card,self).save(*args,**kwargs)
 
 
 class CardProduct(models.Model):
+    slug=models.SlugField(blank=True)
     card = models.ForeignKey(Card, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
@@ -105,6 +140,10 @@ class CardProduct(models.Model):
         # else:
         result = self.product.price * self.quantity
         return result
+    
+    def sava(self,*args,**kwargs):
+        self.slug = slugify(unidecode(f"{self.quantity}-{self.product.name}"))
+        super(CardProduct,self).save(*args,**kwargs)
     
 
     
@@ -130,6 +169,11 @@ class EnterProduct(models.Model):
                 self.product.quantity += self.quantity
                 self.product.save()
         super(EnterProduct, self).save(*args, **kwargs)
+
+
+
+
+
 
 
 

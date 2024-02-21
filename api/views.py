@@ -1,5 +1,6 @@
 from main import models
 from .serializers import *
+from django.contrib.auth import authenticate
 
 from collections import defaultdict
 
@@ -9,14 +10,30 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.authtoken.models import Token
 
 
 #product
 @api_view(["GET"])
 def listproduct(request): #product list
+    
     products=models.Product.objects.all()
     serialazer=ProductSerializer(products, many=True)
     return Response(serialazer.data)
+
+@api_view(["GET"])
+def product_detail(request, slug):
+    product = models.Product.objects.get(slug=slug)
+    product_ser = ProductSerializer(product)
+    product_data = product_ser.data
+
+    images = models.ProductImage.objects.filter(product=product)
+    images_ser = ProductImageSerializer(images, many=True)  # Fix the typo here
+    images_ser_data = images_ser.data
+    product_data['images'] = {'images': images_ser_data}
+    return Response(product_data)
+
+
 
 
 
@@ -30,10 +47,10 @@ def listcategory(request):#category list
 
 
 @api_view(["GET"])
-def categorydetail(request,id): #category detail
-    product=models.Product.objects.filter(category_id=id)
-    serialazer=CategoryDetailSerializer(product, many=True)
-    return Response(serialazer.data)
+def categorydetail(request, slug):  # category detail
+    products = models.Product.objects.filter(category__slug=slug)
+    serializer = CategoryDetailSerializer(products, many=True)
+    return Response(serializer.data)
 
 
 
@@ -44,6 +61,7 @@ def categorydetail(request,id): #category detail
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, BasicAuthentication])
 @permission_classes([IsAuthenticated])
+
 def review_product(request):
     product_id = request.data.get('product_id')  # Assuming 'product_id' is in request data
     user_id = request.data.get('user_id')  # Assuming 'user_id' is in request data
@@ -130,3 +148,26 @@ def listwishlist(request):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     else:
         return Response({'error': 'Product ID and user ID are required in the request data.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+
+@api_view(['GET'])
+def login(request):
+    username=request.data.get('username')
+    password=request.data.get('password')
+    user=authenticate(username=username,password=password)
+    if user:
+        token,_ = Token.objects.get_or_create(user=user)
+        print(token.key)
+        data={
+            'token':token.key
+        }
+
+    return Response(data)
+    
+
+
+
+

@@ -49,8 +49,8 @@ def category_create(request):
     return render(request,'dashboard/category/create.html')
 
 
-def category_update(request,id):
-    category=Category.objects.get(id=id)
+def category_update(request,slug):
+    category=Category.objects.get(slug=slug)
     if request.method=='POST':
         category.name = request.POST['name']
         category.save()
@@ -59,8 +59,8 @@ def category_update(request,id):
 
 
 
-def category_delete(request,id):
-    category=Category.objects.get(id=id)
+def category_delete(request,slug):
+    category=Category.objects.get(slug=slug)
     category.delete()
 
     return redirect('category_list')
@@ -134,6 +134,8 @@ def product(request):
     #     products = Product.objects.filter(filter_conditions)
     # else:
     #     products = Product.objects.all()
+            
+
 
     return render(request, 'dashboard/product/list.html', {'products': products})
 
@@ -154,7 +156,7 @@ def product_create(request):
         price = request.POST['price']
         currency = request.POST['currency']
         baner_image = request.FILES['image']
-        category_id = request.POST['category_id']
+        category_slug = request.POST['category_slug']
         images = request.FILES.getlist('images')
         product = Product.objects.create(
             name=name,
@@ -163,7 +165,7 @@ def product_create(request):
             price=price,
             currency=currency,
             baner_image=baner_image,
-            category_id=category_id
+            category_slug=category_slug
         )
         for image in images:
             ProductImage.objects.create(
@@ -178,9 +180,11 @@ def product_create(request):
 def product_update(request, id):
     product = Product.objects.get(id=id)
     old_banner_image = product.baner_image
+    print(product.slug)
     
     if request.method == 'POST':
         product.name = request.POST['name']
+        product.category_slug = request.POST['category_id   ']
         product.description = request.POST['description']
         quantity = request.POST.get('quantity', '')
         product.quantity = int(quantity) if quantity.isdigit() and quantity != '' else 0
@@ -201,7 +205,7 @@ def product_update(request, id):
         else:
             product.baner_image = old_banner_image
 
-        product.category_id = request.POST['category_id']
+        product.category_slug = request.POST['category_slug']
         
         product.save()
         
@@ -218,8 +222,8 @@ def product_update(request, id):
     return render(request, 'dashboard/product/update.html', context)
 
 
-def product_delete(request,id):
-    product=Product.objects.get(id=id)
+def product_delete(request,slug):
+    product=Product.objects.get(slug=slug)
     product.delete()
 
     return redirect('product')
@@ -243,27 +247,27 @@ def list_enter(request):
 
 def create_enter(request):
     if request.method == 'POST':
-        product_id = request.POST['product_id']
+        product_slug = request.POST['product_slug']
         quantity = int(request.POST['quantity'])
         EnterProduct.objects.create(
-            product_id=product_id,
+            product_slug=product_slug,
             quantity=quantity
         )
         return redirect('list_enter')
     return render(request, 'dashboard/enter/create.html', {'products':Product.objects.all()})
 
 
-def update_enter(request, id):
+def update_enter(request, slug):
     if request.method == 'POST':
         quantity = int(request.POST['quantity'])
-        enter = EnterProduct.objects.get(id=id)
+        enter = EnterProduct.objects.get(slug=slug)
         enter.quantity = quantity
         enter.save()
     return redirect('list_enter')
 
 
-def delete_enter(request, id):
-    EnterProduct.objects.get(id=id).delete()
+def delete_enter(request, slug):
+    EnterProduct.objects.get(slug=slug).delete()
 
     return redirect('list_enter')
 
@@ -347,7 +351,7 @@ def expenditure_excel(request):
     carts = Card.objects.filter(is_active=False)
     cartproducts = CardProduct.objects.filter(card__in=carts)
     data = {
-        "Number": [cartproduct.id for cartproduct in cartproducts],
+        "Number": [cartproduct.slug for cartproduct in cartproducts],
         "Maxsulot nomi": [cartproduct.product.name for cartproduct in cartproducts],
         "Number": [cartproduct.quantity for cartproduct in cartproducts]
     }

@@ -4,9 +4,10 @@ from . import views
 urlpatterns=[
     #product
     path('product/',views.listproduct),
+    path('product_detail/<str:slug>',views.product_detail),
     #category
     path('category/',views.listcategory),
-    path('category/<int:id>',views.categorydetail),
+    path('category/<str:slug>',views.categorydetail),
     #review
     path('review/',views.review_product),
     #cart
@@ -18,5 +19,7 @@ urlpatterns=[
     #wishlist
     path('wishlist/',views.listwishlist),
     #enter
-    path('enter/',views.listenterproduct)
+    path('enter/',views.listenterproduct),
+    #login
+    path('login',views.login)
 ]

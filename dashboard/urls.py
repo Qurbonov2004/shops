@@ -15,6 +15,7 @@ urlpatterns = [
     path('product/create/', product_create, name='product_create'),
     path('product/delete/<int:id>/', product_delete, name='product_delete'),
     path('product/update/<int:id>/', product_update, name='product_update'),
+
     path('product/write/', write, name='write'),
     path('product/expenditure/', expenditure, name='expenditure'),
     path('product/expenditure_excel/', expenditure_excel, name='expenditure_excel'),

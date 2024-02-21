@@ -12,15 +12,15 @@ def index(request):
     productimage = ProductImage.objects.all() 
     productreview = ProductReview.objects.all()
     
-    user_id = request.user.id
+    user_slug = request.user.slug
     if request.user.is_authenticated:
         # Assuming you have a specific product instance, replace 'specific_product' with the actual product instance
-        specific_product = Product.objects.get(pk=1)  # Replace '1' with the actual product ID
+        specific_product = Product.objects.get(pk=1)  # Replace '1' with the actual product slug
         objects = WishList.objects.filter(user=request.user, product=specific_product)
         
         is_saved = None
         if objects:
-            is_saved = objects.first().id
+            is_saved = objects.first().slug
         else:
             is_saved = False
 
@@ -30,8 +30,8 @@ def index(request):
     # WishList uchun is_saved qiymati olish
     # if request.user.is_authenticated:  # Foydalanuvchining tizimga kirganligini tekshirish
     #     objects = WishList.objects.filter(user=request.user)
-    #     if objects.product.id==product.id:
-    #         is_saved = objects.first().id
+    #     if objects.product.slug==product.slug:
+    #         is_saved = objects.first().slug
     #     else:
     #         is_saved = False
 
@@ -46,7 +46,7 @@ def index(request):
         'productreview': productreview,
         'user': request.user,
         'is_saved': is_saved,
-        'user_id':user_id
+        'user_slug':user_slug
     }
 
     return render(request, 'index.html', context)
@@ -80,19 +80,19 @@ def products(request):
 
 from django.shortcuts import get_object_or_404
 
-def detail(request, id):
+def detail(request, slug):
     products = Product.objects.all()
-    product = get_object_or_404(Product, id=id)
+    product = get_object_or_404(Product, slug=slug)
 
-    # Check if the product has a category before accessing its id
-    category_id = product.category.id if product.category else None
+    # Check if the product has a category before accessing its slug
+    category_slug = product.category.slug if product.category else None
     
-    images = ProductImage.objects.filter(product_id=product.id)
-    recomendation = Product.objects.filter(category_id=category_id).exclude(id=product.id)[:3]
+    images = ProductImage.objects.filter(product_slug=product.slug)
+    recomendation = Product.objects.filter(category_slug=category_slug).exclude(slug=product.slug)[:3]
     objects = WishList.objects.filter(user=request.user, product=product)
     is_saved = None
     if objects:
-        is_saved = objects.first().id
+        is_saved = objects.first().slug
     else:
         is_saved = False
 
@@ -151,8 +151,8 @@ def carts(request):
     return render(request,'cart/carts.html',context)
 
 
-def cart_detail(request,id):
-    cart=Card.objects.get(id=id)
+def cart_detail(request,slug):
+    cart=Card.objects.get(slug=slug)
     items=CardProduct.objects.filter(card=cart)
 
     context={
@@ -163,19 +163,19 @@ def cart_detail(request,id):
 
 
 def cart_detail_delete(request):
-    item_id = request.GET['items_id']
-    item = CardProduct.objects.get(id=item_id)
-    cart_id = item.card.id
+    item_slug = request.GET['items_slug']
+    item = CardProduct.objects.get(slug=item_slug)
+    cart_slug = item.card.slug
     item.delete()
-    return redirect('main:cart_detail', cart_id)
+    return redirect('main:cart_detail', cart_slug)
 
 
 
 
 
 
-def add_to_cart(request, id):
-    product = get_object_or_404(Product, id=id)
+def add_to_cart(request, slug):
+    product = get_object_or_404(Product, slug=slug)
 
     user = request.user
     active_card = Card.objects.filter(user=user, is_active=True).first()
@@ -197,8 +197,8 @@ def add_to_cart(request, id):
 
 
 
-def buy_cart(request, id):
-    cart=Card.objects.get(id=id , is_active=True)
+def buy_cart(request, slug):
+    cart=Card.objects.get(slug=slug , is_active=True)
     cart_products=CardProduct.objects.filter(card=cart)
     for cart_product in cart_products:
         product=cart_product.product
@@ -213,7 +213,7 @@ def buy_cart(request, id):
 def create_wishlist(request):
     WishList.objects.create(
         user=request.user,
-        product_id=request.GET['product_id']
+        product_slug=request.GET['product_slug']
     )
 
     return redirect('main:index')
@@ -225,9 +225,9 @@ def list_wishlist(request):
 
 from django.shortcuts import get_object_or_404, redirect
 
-def delete_wish(request, id):
+def delete_wish(request, slug):
     user = request.user
-    wish = get_object_or_404(WishList, product_id=id, user=user)
+    wish = get_object_or_404(WishList, product_slug=slug, user=user)
     wish.delete()
     return redirect('main:detail')
 
